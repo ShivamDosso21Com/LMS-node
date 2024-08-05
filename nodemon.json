@@ -1,0 +1,8 @@
+
+
+{
+  "watch": ["NODEJS"],
+  "ext": "ts",
+  "ignore": ["node_modules"],
+  "exec": "npx tsc && node --env-file .env dist/server.js"
+}
