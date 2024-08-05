@@ -12,7 +12,7 @@ interface TokenPayload {
 
 const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['authorization'];
-//   const token = authHeader && authHeader.split(' ')[1];
+//   const token = authHeader && authHeader.split(' ')[1]; this is middle ware
 
   if (token == null) {
     return res.status(401).send({message : 'unauthorized'}); // Unauthorized if no token is provided

@@ -3,21 +3,20 @@ import sequelize from '../config/database';
 
 class Student extends Model {
   public id!: number;
-  public contactnumber!: number;
+  public contactNumber!: number;
+  public name!: string;
   public studentId!: string;
-  public studentname!: string;
-  public username!: string;
+  public studentName!: string;
+  public userName!: string;
   public isDeleted!: boolean;
-  public studentidimage!: string;
-  public aadharcardnumber!: number | null;
-  public aadharimage!: string;
-  public emailaddress!: string;
+  public emailAddress!: string;
+  public courseId!: string;
   public password!: string;
   public referbyId!: string;
   public status!: boolean;
   public otp!: number;
   public token!: string;
-  public studentprofile!: string;
+  public studentProfile!: string;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
@@ -29,7 +28,7 @@ Student.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    contactnumber: {
+    contactNumber: {
       type: new DataTypes.BIGINT(), // Using BIGINT to accommodate larger numbers
       allowNull: false,
       unique: true,
@@ -46,7 +45,7 @@ Student.init(
       allowNull: false,
       unique: true,
     },
-    studentname: {
+    studentName: {
       type: new DataTypes.STRING(128),
       allowNull: false,
     },
@@ -54,21 +53,22 @@ Student.init(
       type: new DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    username: {
+    userName: {
       type: new DataTypes.STRING(128),
       allowNull: false,
     },
-    aadharcardnumber: {
-      type: DataTypes.BIGINT(), // Using BIGINT for 12-digit Aadhar number
-      allowNull: true,
-    },
-    aadharimage: {
-      type: new DataTypes.STRING(128),
-      allowNull: true,
-    },
-    emailaddress: {
+    name: {
       type: new DataTypes.STRING(128),
       allowNull: false,
+    },
+    courseId: {
+      type: new DataTypes.STRING(128),
+      allowNull: false,
+    },
+    emailAddress: {
+      type: new DataTypes.STRING(128),
+      allowNull: false,
+      unique: true,
       validate: {
         isEmail: true,
       },
@@ -91,7 +91,7 @@ Student.init(
       defaultValue: true,
       comment: '1 => activated or 0 => deactivated',
     },
-    studentprofile: {
+    studentProfile: {
       type: new DataTypes.STRING(128),
       allowNull: true,
     },
@@ -286,7 +286,7 @@ Otp.init(
 );
 
 sequelize.sync({alter : false }).then(() => {
-  console.log('Students table created.');
+  console.log('Otp table created.');
 });
 
 // sequelize.sync({ force: true }).then(() => {

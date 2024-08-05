@@ -30,4 +30,3 @@ export const findAllUsers = async () => {
     attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
   });
 };
-
