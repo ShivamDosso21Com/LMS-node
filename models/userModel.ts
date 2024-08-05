@@ -15,7 +15,7 @@ class Student extends Model {
   public password!: string;
   public referbyId!: string;
   public status!: boolean;
-  public otp!: string;
+  public otp!: number;
   public token!: string;
   public studentprofile!: string;
   public createdAt!: Date;
@@ -82,7 +82,7 @@ Student.init(
       allowNull: false,
     },
     otp: {
-      type: new DataTypes.STRING(128),
+      type: DataTypes.INTEGER(), // Using BIGINT for 12-digit Aadhar number
       allowNull: true,
     },
     status: {
@@ -96,7 +96,7 @@ Student.init(
       allowNull: true,
     },
     token: {
-      type: new DataTypes.STRING(128),
+      type: new DataTypes.STRING(250),
       allowNull: true,
     },
     createdAt: {

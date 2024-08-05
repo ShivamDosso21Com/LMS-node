@@ -225,44 +225,28 @@ export const login = async (req: Request, res: Response) => {
 
 export const Logout = async (req: Request, res: Response) => {
   try {
-   
-    const { contactnumber, password } = req.body;
-    // Validate input
-    if (!contactnumber || !password) {
-      return res
-        .status(400)
-        .json({ message: "Mobile number and password are required" });
-    }
-    // Find the user by mobile number
-  
-    let checkNumber =  await  Student.findOne({ where: { contactnumber ,isDeleted : false} });
+    const token = req.headers['authorization'];
 
-    if (!checkNumber) {
-      return res
-        .status(401)
-        .json({ message: "Invalid mobile number or password" });
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
     }
 
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, checkNumber.password);
+    // Update the token field to null where the token matches
+    const [affectedRows] = await Student.update(
+      { token: null },
+      { where: { token } }
+    );
 
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ message: "Invalid mobile number or password" });
+    if (affectedRows === 0) {
+      return res.status(404).json({ message: 'Token not found' });
     }
 
-    // Generate a token
-    const token = jwt.sign({ id: checkNumber.id }, `${process.env.SECRET_KEY}`);
-
-    res
-      .status(200)
-      .json({ token,  user: { id: checkNumber.id, mobileNo: checkNumber.contactnumber } });
+    return res.status(200).json({ message: 'User logged out successfully' });
   } catch (error) {
-    //console.log("error", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 export const forgotPassword = async (req: Request, res: Response) => {
