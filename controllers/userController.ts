@@ -98,6 +98,7 @@ export const create = async (req: Request, res: Response) => {
     }
 
     const finalresult = await createUser(req.body);
+    finalresult.password  =strongPassword;
     res.status(201).json({ data: finalresult });
   } catch (error) {
     //console.log("error", error);
@@ -200,9 +201,9 @@ export const DeleteFunction = async (req: Request, res: Response) => {
 // Function to find a user by mobile number and validate password
 export const login = async (req: Request, res: Response) => {
   try {
-    const { contactNumber, password } = req.body;
+    const { userName, password } = req.body;
     // Validate input
-    if (!contactNumber || !password) {
+    if (!userName || !password) {
       return res
         .status(400)
         .json({ message: "Mobile number and password are required" });
@@ -210,7 +211,7 @@ export const login = async (req: Request, res: Response) => {
     // Find the user by mobile number
 
     let checkNumber = await Student.findOne({
-      where: { contactNumber, isDeleted: false },
+      where: { userName, isDeleted: false },
     });
 
     if (!checkNumber) {
@@ -233,14 +234,13 @@ export const login = async (req: Request, res: Response) => {
 
     await Student.update(
       { token: token },
-      { where: { contactNumber, isDeleted: false } }
+      { where: { userName, isDeleted: false } }
     );
 
     res
       .status(200)
       .json({
-        token,
-        user: { id: checkNumber.id, mobileNo: checkNumber.contactNumber },
+        data: {  token, id: checkNumber.id, mobileNo: checkNumber.contactNumber },
       });
   } catch (error) {
     //console.log("error", error);

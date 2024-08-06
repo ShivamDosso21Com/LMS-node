@@ -7,6 +7,7 @@ class Student extends Model {
   public name!: string;
   public studentId!: string;
   public studentName!: string;
+  public wallet!: number;
   public userName!: string;
   public isDeleted!: boolean;
   public emailAddress!: string;
@@ -48,6 +49,11 @@ Student.init(
     studentName: {
       type: new DataTypes.STRING(128),
       allowNull: false,
+    },
+    wallet: {
+      type: DataTypes.INTEGER(),
+      allowNull: false,
+      defaultValue : 0
     },
     isDeleted: {
       type: new DataTypes.BOOLEAN,
