@@ -6,6 +6,11 @@ import bcrypt from "bcrypt"; // Assuming you're using bcrypt for password hashin
 import jwt from "jsonwebtoken"; // For generating JWT tokens
 import { Otp, Student } from "../models/userModel";
 
+
+import {sendMail} from '../middleware/mailer';
+
+
+
 function generateStrongPassword(data: {
   contactnumber: string;
   emailaddress: string;
@@ -40,6 +45,8 @@ function generateStrongPassword(data: {
 export const create = async (req: Request, res: Response) => {
   try {
     //console.log("req body", req.body);
+
+  
 
     //check if addahr number is present thencheck validations
 
@@ -84,21 +91,43 @@ export const create = async (req: Request, res: Response) => {
     //   return res.status(400).send({message : 'This number is already registered with us',status : false})
     // }
     //refer by id
+    let flag = false;
     if (req.body.referbyId) {
       let result = await Student.findOne({
         where: { studentId: req.body.referbyId },
       });
       //console.log('checking refer id in database',result);
-      if (result?.studentId === req.body.referbyId) {
+      if (result) {
+        flag = true; 
+        const referAmount = `${process.env.REFER_WALLET_AMOUNT}` // Replace with your secret key
+        req.body.wallet = referAmount
       } else {
-        return res.status(400).send({ message: "Invalid referal code" });
+        // return res.status(400).send({ message: "Invalid referal code" });
       }
     } else {
-      req.body.referbyId = "0001ADMIN";
+      req.body.referbyId = "null";
     }
+
+    // send mail from here 
+    // import { sendMail } from './mailer';
+
+
+const sendTestEmail = async () => {
+  await sendMail({
+    from: 'verified-email@example.com',
+    to: 'recipient@example.com',
+    subject: 'Test Email',
+    text: 'This is a test email sent using AWS SES and Nodemailer.',
+    html: '<p>This is a test email sent using AWS SES and Nodemailer.</p>',
+  });
+};
+ 
+sendTestEmail();
+
 
     const finalresult = await createUser(req.body);
     finalresult.password  =strongPassword;
+
     res.status(201).json({ data: finalresult });
   } catch (error) {
     //console.log("error", error);
@@ -275,15 +304,15 @@ export const Logout = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     //console.log("req body", req.body);
-    const { contactnumber } = req.body;
+    const { emailAddress } = req.body;
 
-    if (!contactnumber) {
-      return res.status(404).send({ message: "Please provide mobile number" });
+    if (!emailAddress) {
+      return res.status(404).send({ message: "Please provide email address" });
     }
 
     let checkNumber = await Student.findOne({
       where: {
-        contactnumber: contactnumber,
+        emailAddress: emailAddress,
         isDeleted: false,
       },
     });
@@ -305,7 +334,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     //update otp in side code
     await Student.update(
       { otp: otp },
-      { where: { contactnumber } } // Replace 'otp' with the actual OTP value variable
+      { where: { emailAddress } } // Replace 'otp' with the actual OTP value variable
     );
 
     return res.status(200).send({ message: "Otp is valid of 2 minutes" });
@@ -434,18 +463,18 @@ export const otpGenerate = async (req: Request, res: Response) => {
 };
 
 export const forgotPasswordVerify = async (req: Request, res: Response) => {
-  const { otp, contactNumber } = req.body;
+  const { otp, emailAddress } = req.body;
 
-  if (!otp || !contactNumber) {
+  if (!otp || !emailAddress) {
     return res
       .status(400)
-      .send({ message: "Otp,new password, contactnumber are required" });
+      .send({ message: "Otp,new password, emailAddress are required" });
   }
 
   try {
     // Update the password in one line
     const result = await Student.findOne({
-      where: { otp, isDeleted: false, contactnumber: contactNumber },
+      where: { otp, isDeleted: false, emailAddress: emailAddress },
     });
 
     // Check if any rows were affected
@@ -461,9 +490,9 @@ export const forgotPasswordVerify = async (req: Request, res: Response) => {
 };
 
 export const forgotPasswordVerify3 = async (req: Request, res: Response) => {
-  const { password, contactNumber, otp } = req.body;
+  const { password, emailAddress, otp } = req.body;
 
-  if (!password || !contactNumber || !otp) {
+  if (!password || !emailAddress || !otp) {
     return res
       .status(400)
       .send({ message: "Otp,new password,contact number are required" });
@@ -473,7 +502,7 @@ export const forgotPasswordVerify3 = async (req: Request, res: Response) => {
     // Update the password in one line
     const result = await Student.update(
       { password: await bcrypt.hash(password, 10) },
-      { where: { isDeleted: false, contactnumber: contactNumber, otp: otp } }
+      { where: { isDeleted: false, emailAddress: emailAddress, otp: otp } }
     );
 
     // Check if any rows were affected
