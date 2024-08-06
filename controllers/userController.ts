@@ -5,10 +5,10 @@ import { ValidationError, where } from "sequelize";
 import bcrypt from "bcrypt"; // Assuming you're using bcrypt for password hashing
 import jwt from "jsonwebtoken"; // For generating JWT tokens
 import { Otp, Student } from "../models/userModel";
+import {StudentCourseTable} from '../models/studentCourseModel';
+import {CourseTable} from '../models/courseModel';
 
-
-import {sendMail} from '../middleware/mailer';
-
+import {transporter} from '../middleware/nodeMailer';
 
 
 function generateStrongPassword(data: {
@@ -42,11 +42,10 @@ function generateStrongPassword(data: {
   return password;
 }
 
+
 export const create = async (req: Request, res: Response) => {
   try {
     //console.log("req body", req.body);
-
-  
 
     //check if addahr number is present thencheck validations
 
@@ -108,25 +107,100 @@ export const create = async (req: Request, res: Response) => {
       req.body.referbyId = "null";
     }
 
-    // send mail from here 
-    // import { sendMail } from './mailer';
-
-
-const sendTestEmail = async () => {
-  await sendMail({
-    from: 'verified-email@example.com',
-    to: 'recipient@example.com',
-    subject: 'Test Email',
-    text: 'This is a test email sent using AWS SES and Nodemailer.',
-    html: '<p>This is a test email sent using AWS SES and Nodemailer.</p>',
-  });
-};
- 
-sendTestEmail();
-
 
     const finalresult = await createUser(req.body);
     finalresult.password  =strongPassword;
+
+    //sotre user id and course id in this table 
+    let courseId = req.body.courseId; 
+   
+
+    for(let i = 0 ; i <courseId.length; i++){
+      let finalData = {
+        studentId : finalresult.id,
+        courseId : courseId[i]
+     }
+     await StudentCourseTable.create(finalData);
+    }
+
+    const mailOptions = {
+      from: process.env.USER_NAME,
+      to: finalresult.emailAddress, // List of receivers
+      subject: 'Welcome to Skillontime! Your Account Details',
+      text: `Hi ${finalresult.name},\n\nWelcome to Skillontime!\n\nYour account has been successfully created. Here are your login details:\n\nUsername: ${finalresult.userName}\nPassword: ${finalresult.password}\n\nPlease make sure to keep your password safe and secure. If you have any questions or need assistance, feel free to contact our support team.\n\nBest regards,\nSkillontime Support Team\nsupport@skillontime.com`,
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f9f9f9;
+                }
+                .container {
+                    width: 80%;
+                    margin: 0 auto;
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                    color: #007BFF;
+                }
+                .details {
+                    font-size: 16px;
+                    margin: 20px 0;
+                }
+                .footer {
+                    margin-top: 20px;
+                    font-size: 14px;
+                    color: #666;
+                }
+                .logo {
+                    width: 150px;
+                    height: auto;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <img src="https://skillontime.com/wp-content/uploads/2024/08/SOT001-300x200.png" alt="Company Logo" class="logo">
+                <h1>Welcome to Skillontime!</h1>
+                <p>Hi ${finalresult.name},</p>
+                <p>Welcome to Skillontime! Your account has been successfully created. Below are your login details:</p>
+                <div class="details">
+                    <p><strong>Username:</strong> ${finalresult.userName}</p>
+                    <p><strong>Password:</strong> ${finalresult.password}</p>
+                </div>
+                <p>Please make sure to keep your password safe and secure. If you have any questions or need assistance, feel free to contact our support team.</p>
+                <p class="footer">
+                    Best regards,<br>
+                    Skillontime Support Team<br>
+                    <a href="mailto:support@skillontime.com">support@skillontime.com</a>
+                </p>
+            </div>
+        </body>
+        </html>
+      `,
+    };
+    
+
+    
+transporter.sendMail(mailOptions, (error : any , info : any) => {
+  console.log('error and info ',error,info)
+  if (error) {
+    return console.log('Error:', error);
+  }
+  console.log('Message sent: %s', info.messageId);
+});
+
+    
 
     res.status(201).json({ data: finalresult });
   } catch (error) {
@@ -230,7 +304,10 @@ export const DeleteFunction = async (req: Request, res: Response) => {
 // Function to find a user by mobile number and validate password
 export const login = async (req: Request, res: Response) => {
   try {
-    const { userName, password } = req.body;
+
+
+   
+     const { userName, password } = req.body;
     // Validate input
     if (!userName || !password) {
       return res
@@ -266,14 +343,60 @@ export const login = async (req: Request, res: Response) => {
       { where: { userName, isDeleted: false } }
     );
 
+
+    const studentId =  checkNumber.id;
+
+    const courses = await CourseTable.findAll({
+      attributes: ['name'], // Select only the 'name' attribute from CourseTable
+      include: [
+        {
+          model: StudentCourseTable,
+          attributes: [], // Exclude attributes from StudentCourseTable
+          where: { studentId }, // Filter by studentId
+        },
+      ],
+    });
+
+    // Extract course names and student data directly from the results
+    let userData = await Student.findOne({
+      where: { userName, isDeleted: false },
+    });
+    console.log(courses);
+
+
+    //send mail to user
+    // Send mail with defined transport object
+    let isMailSent = null;
+
+    // Setup email data
+const mailOptions = {
+  from: `${process.env.USER_NAME}`, // sender address
+  to: 'vikramsinghkhinchi5@gmail.com', // list of receivers
+  subject: 'Hello ✔', // Subject line
+  text: 'Hello world this is testng mesage for you ?', // plain text body
+  html: '<b>Hello world this is html hwllo works ?</b>' // html body
+};
+
+
+transporter.sendMail(mailOptions, (error : any , info : any) => {
+  console.log('error and info ',error,info)
+  if (error) {
+    isMailSent = error
+    return console.log('Error:', error);
+  }
+  isMailSent = info
+  console.log('Message sent: %s', info.messageId);
+});
+
+
     res
       .status(200)
       .json({
-        data: {  token, id: checkNumber.id, mobileNo: checkNumber.contactNumber },
+        data: { isMailSent ,courses, userData , token, id: checkNumber.id, mobileNo: checkNumber.contactNumber },
       });
   } catch (error) {
     //console.log("error", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error",data :error });
   }
 };
 
@@ -327,7 +450,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     if (!checkNumber) {
       return res.status(404).send({
         message:
-          "This number is not exist in our record please try with another number",
+          "This email is not exist in our record please try with another email",
       });
     }
 
@@ -337,7 +460,98 @@ export const forgotPassword = async (req: Request, res: Response) => {
       { where: { emailAddress } } // Replace 'otp' with the actual OTP value variable
     );
 
-    return res.status(200).send({ message: "Otp is valid of 2 minutes" });
+    // const mailOptions = {
+    //   from: `${process.env.USER_NAME}`, // sender address
+    //   to: checkNumber.emailAddress, // list of receivers
+    //   subject: 'Forgot-password otp is here', // Subject line
+    //   text: 'Hello world this is testng mesage for you ?', // plain text body
+    //   html: '<b>Hello world this is html hwllo works otp ?</b>' // html body
+    // };
+
+
+    const mailOptions = {
+      from: process.env.USER_NAME,
+      to: checkNumber.emailAddress, // List of receivers
+      subject: 'Forgot Password OTP',
+      text: `Hi ${checkNumber.name},\n\nWe received a request to reset your password.\n\nTo reset your password, please use the following OTP (One-Time Password):\n\n${otp}\n\nThis OTP is valid for the next 15 minutes. If you did not request a password reset, please ignore this email or contact our support team if you have any concerns.\n\nBest regards,\n[Your Company Name] Support Team\n[support@skillontime.com]`,
+      html: `
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007BFF;
+        }
+        .otp {
+            display: block;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+        p {
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://skillontime.com/wp-content/uploads/2024/08/SOT001-300x200.png" alt="Company Logo" class="logo">
+        <h1>Password Reset Request</h1>
+        <p>Hi ${checkNumber.name},</p>
+        <p>We received a request to reset your password. To proceed, please use the following One-Time Password (OTP):</p>
+        <p class="otp">${otp}</p>
+        <p>This OTP is valid for the next 15 minutes. If you did not request a password reset, please ignore this email or contact our support team if you have any concerns.</p>
+        <p class="footer">
+            Best regards,<br>
+          Skillontime Support Team<br>
+            <a href="mailto:support@skillontime.com">support@skillontime.com</a>
+        </p>
+    </div>
+</body>
+</html>
+
+      `,
+    };
+    
+    
+    
+    transporter.sendMail(mailOptions, (error : any , info : any) => {
+      console.log('error and info ',error,info)
+      if (error) {
+        return console.log('Error:', error);
+      }
+      console.log('Message sent: %s', info.messageId);
+    });
+    
+
+    return res.status(200).send({ message: "An OTP has been successfully sent to your registered email. It is valid for 2 minutes." });
   } catch (error) {
     //console.log("error", error);
     res.status(500).json({ message: "Internal server error" });
@@ -495,7 +709,7 @@ export const forgotPasswordVerify3 = async (req: Request, res: Response) => {
   if (!password || !emailAddress || !otp) {
     return res
       .status(400)
-      .send({ message: "Otp,new password,contact number are required" });
+      .send({ message: "Otp,new password,email are required" });
   }
 
   try {
@@ -511,7 +725,7 @@ export const forgotPasswordVerify3 = async (req: Request, res: Response) => {
         .status(404)
         .send({
           message:
-            "Couldn't update password please enter correct number and password",
+            "Couldn't update password please enter correct email and password",
         });
     }
 

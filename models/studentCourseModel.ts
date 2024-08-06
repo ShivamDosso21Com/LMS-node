@@ -1,26 +1,31 @@
 // import { Sequelize, DataTypes, Model } from 'sequelize';
 // import sequelize from '../config/database';
 
-// class CourseTable extends Model {
+// class StudentCourseTable extends Model {
 //   public id!: number;
-//   public name!: number;
+//   public studentId!: number;
+//   public courseId!: number;
 //   public isDeleted!: boolean;
 //   public status!: boolean;
 //   public createdAt!: Date;
 //   public updatedAt!: Date;
 // }
 
-// CourseTable.init(
+// StudentCourseTable.init(
 //   {
 //     id: {
 //       type: DataTypes.INTEGER.UNSIGNED,
 //       autoIncrement: true,
 //       primaryKey: true,
 //     },
-//     name: {
+//     studentId: {
 //       type: new DataTypes.STRING(128),
 //       allowNull: false,
 //     },
+//     courseId: {
+//         type: new DataTypes.STRING(128),
+//         allowNull: false,
+//       },
 //     isDeleted: {
 //       type: new DataTypes.BOOLEAN,
 //       defaultValue: false,
@@ -41,7 +46,7 @@
 //     },
 //   },
 //   {
-//     tableName: 'coursetable',
+//     tableName: 'studentcoursetable',
 //     sequelize,
 //   }
 // );
@@ -51,9 +56,7 @@
 // });
 
 
-
-// export { CourseTable };
-
+// export { StudentCourseTable };
 
 
 
@@ -61,34 +64,34 @@
 
 
 
-
-
-
-
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
-import { StudentCourseTable } from './studentCourseModel';
+import { Student } from './userModel';
+import { CourseTable } from './courseModel';
 
-
-
-class CourseTable extends Model {
+class StudentCourseTable extends Model {
   public id!: number;
-  public name!: string; // Changed to string for course name
+  public studentId!: number;
+  public courseId!: number;
   public isDeleted!: boolean;
   public status!: boolean;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
 
-CourseTable.init(
+StudentCourseTable.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },
-    name: {
-      type: new DataTypes.STRING(128),
+    studentId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
+    courseId: {
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
     isDeleted: {
@@ -111,21 +114,20 @@ CourseTable.init(
     },
   },
   {
-    tableName: 'coursetable',
+    tableName: 'studentcoursetable',
     sequelize,
   }
 );
 
 
-CourseTable.hasMany(StudentCourseTable, { foreignKey: 'courseId' });
-StudentCourseTable.belongsTo(CourseTable, { foreignKey: 'courseId' });
-// 
-// CourseTable.hasOne(StudentCourseTable, { foreignKey: 'courseId' });
 
+// Define associations
+// StudentCourseTable.belongsTo(Student, { foreignKey: 'studentId' });
+// StudentCourseTable.belongsTo(CourseTable, { foreignKey: 'courseId' });
 
 
 sequelize.sync({ alter: false }).then(() => {
-  console.log('Course table created.');
+  console.log('StudentCourseTable created.');
 });
 
-export { CourseTable };
+export { StudentCourseTable };

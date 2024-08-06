@@ -1,5 +1,6 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
+import { StudentCourseTable } from './studentCourseModel'; // Import the related model
 
 class Student extends Model {
   public id!: number;
@@ -11,7 +12,6 @@ class Student extends Model {
   public userName!: string;
   public isDeleted!: boolean;
   public emailAddress!: string;
-  public courseId!: string;
   public password!: string;
   public referbyId!: string;
   public status!: boolean;
@@ -30,7 +30,7 @@ Student.init(
       primaryKey: true,
     },
     contactNumber: {
-      type: new DataTypes.BIGINT(), // Using BIGINT to accommodate larger numbers
+      type: new DataTypes.BIGINT(),
       allowNull: false,
       unique: true,
       validate: {
@@ -67,10 +67,6 @@ Student.init(
       type: new DataTypes.STRING(128),
       allowNull: false,
     },
-    courseId: {
-      type: new DataTypes.STRING(128),
-      allowNull: false,
-    },
     emailAddress: {
       type: new DataTypes.STRING(128),
       allowNull: false,
@@ -88,7 +84,7 @@ Student.init(
       allowNull: false,
     },
     otp: {
-      type: DataTypes.INTEGER(), // Using BIGINT for 12-digit Aadhar number
+      type: DataTypes.INTEGER(),
       allowNull: true,
     },
     status: {
@@ -120,9 +116,145 @@ Student.init(
   }
 );
 
+// Define the associations
+Student.hasMany(StudentCourseTable, { foreignKey: 'studentId' });
+StudentCourseTable.belongsTo(Student, { foreignKey: 'studentId' });
+// Student.hasOne(StudentCourseTable, { foreignKey: 'studentId' });
+
+
 sequelize.sync({ alter: false }).then(() => {
   console.log('Students table created.');
 });
+
+export { Student };
+
+
+
+
+
+
+
+
+// import { Sequelize, DataTypes, Model } from 'sequelize';
+// import sequelize from '../config/database';
+
+// class Student extends Model {
+//   public id!: number;
+//   public contactNumber!: number;
+//   public name!: string;
+//   public studentId!: string;
+//   public studentName!: string;
+//   public wallet!: number;
+//   public userName!: string;
+//   public isDeleted!: boolean;
+//   public emailAddress!: string;
+//   public password!: string;
+//   public referbyId!: string;
+//   public status!: boolean;
+//   public otp!: number;
+//   public token!: string;
+//   public studentProfile!: string;
+//   public createdAt!: Date;
+//   public updatedAt!: Date;
+// }
+
+// Student.init(
+//   {
+//     id: {
+//       type: DataTypes.INTEGER.UNSIGNED,
+//       autoIncrement: true,
+//       primaryKey: true,
+//     },
+//     contactNumber: {
+//       type: new DataTypes.BIGINT(), // Using BIGINT to accommodate larger numbers
+//       allowNull: false,
+//       unique: true,
+//       validate: {
+//         isTenDigits(value: number) {
+//           if (!/^[6-9]\d{9}$/.test(String(value))) {
+//             throw new Error('Contact number must be a 10-digit number starting with a digit between 6 and 9.');
+//           }
+//         }
+//       },
+//     },
+//     studentId: {
+//       type: DataTypes.STRING(24),
+//       allowNull: false,
+//       unique: true,
+//     },
+//     studentName: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//     },
+//     wallet: {
+//       type: DataTypes.INTEGER(),
+//       allowNull: false,
+//       defaultValue : 0
+//     },
+//     isDeleted: {
+//       type: new DataTypes.BOOLEAN,
+//       defaultValue: false,
+//     },
+//     userName: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//     },
+//     name: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//     },
+//     emailAddress: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//       unique: true,
+//       validate: {
+//         isEmail: true,
+//       },
+//     },
+//     password: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//     },
+//     referbyId: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: false,
+//     },
+//     otp: {
+//       type: DataTypes.INTEGER(), // Using BIGINT for 12-digit Aadhar number
+//       allowNull: true,
+//     },
+//     status: {
+//       type: new DataTypes.BOOLEAN,
+//       allowNull: false,
+//       defaultValue: true,
+//       comment: '1 => activated or 0 => deactivated',
+//     },
+//     studentProfile: {
+//       type: new DataTypes.STRING(128),
+//       allowNull: true,
+//     },
+//     token: {
+//       type: new DataTypes.STRING(250),
+//       allowNull: true,
+//     },
+//     createdAt: {
+//       type: DataTypes.DATE,
+//       allowNull: false,
+//     },
+//     updatedAt: {
+//       type: DataTypes.DATE,
+//       allowNull: false,
+//     },
+//   },
+//   {
+//     tableName: 'students',
+//     sequelize,
+//   }
+// );
+
+// sequelize.sync({ alter: false }).then(() => {
+//   console.log('Students table created.');
+// });
 
 
 
@@ -301,6 +433,4 @@ sequelize.sync({alter : false }).then(() => {
 
 
 export { Otp };
-export { Student };
-
 
