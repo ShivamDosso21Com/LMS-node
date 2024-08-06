@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"vikram singh\",\r\n    \"contactNumber\" : \"6098767904\",\r\n    \"emailAddress\"  : \"vikraskhnchi0@gmail.com\",\r\n    \"courseId\" : 1234576\r\n}",
+							"raw": "{\r\n    \"name\": \"vikram singh\",\r\n    \"contactNumber\" : \"6990767908\",\r\n    \"emailAddress\"  : \"vkrashnchi@gmail.com\",\r\n    \"courseId\" : 1234576\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -46,7 +46,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzIyODM1MTk0fQ.W9KVIKxVyZIP0Ebkaz4TjDrJUVsJm-6zl2Bm5fbauLA",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzIyODU1ODU1fQ.yWxICHp5rzaigzudejvG07ckRjoNW4JwmlRCsOQqd5k",
 								"type": "text"
 							}
 						],
@@ -70,7 +70,14 @@
 					"name": "Delete-Student",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"contactNumber\" : 8824476139\r\n}",
@@ -103,7 +110,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzIyODQ5MTY4fQ.7ngQD4CN6rGLwgwrhfEmJK4yM8vkrVh_D0xpG2v5KTM",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzIyODU1ODU1fQ.yWxICHp5rzaigzudejvG07ckRjoNW4JwmlRCsOQqd5k",
 								"type": "text"
 							}
 						],
@@ -171,7 +178,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"contactNumber\" : \"6098767904\",\r\n    \"password\" : \"thisme132@2e3red\"\r\n}",
+							"raw": "{\r\n    \"userName\" : \"vwkraskhnchi\",\r\n    \"password\" : \"6a1kkhc9ci\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -200,7 +207,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzIyODQ5MTY4fQ.7ngQD4CN6rGLwgwrhfEmJK4yM8vkrVh_D0xpG2v5KTM",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzIyODU0NzA5fQ.S4DRh1E6d8vfSmcuOcOGxEBIH4M0ALanz16GVlBNo1o",
 								"type": "text"
 							}
 						],
@@ -330,9 +337,9 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "upload",
+									"key": "",
 									"type": "file",
-									"src": "/C:/Users/vikra/Downloads/Untitled design (33).png"
+									"src": "postman-cloud:///1ef53248-cea2-4d20-9550-92c1133ea9eb"
 								}
 							]
 						},
