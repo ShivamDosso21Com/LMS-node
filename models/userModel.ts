@@ -121,6 +121,8 @@ Student.hasMany(StudentCourseTable, { foreignKey: 'studentId' });
 StudentCourseTable.belongsTo(Student, { foreignKey: 'studentId' });
 
 
+
+
 sequelize.sync({ alter: false }).then(() => {
   console.log('Students table created.');
 });

@@ -9,6 +9,7 @@ import {StudentCourseTable} from '../models/studentCourseModel';
 import {CourseTable} from '../models/courseModel';
 
 import {transporter} from '../middleware/nodeMailer';
+import { Op } from "sequelize";
 
 
 function generateStrongPassword(data: {
@@ -45,12 +46,31 @@ function generateStrongPassword(data: {
 
 export const create = async (req: Request, res: Response) => {
   try {
+    const courseIds = req.body.courseId;
     //console.log("req body", req.body);
-
     //check if addahr number is present thencheck validations
 
     if (Object.keys(req.body).length === 0) {
       return res.status(400).send({ message: "Send at least one key" });
+    }
+
+    //check course table has data or not
+    if (!Array.isArray(courseIds) || courseIds.length === 0) {
+      return res.status(400).json({ message: "courseIds should be a non-empty array" });
+    }
+
+    // Find courses with the given IDs
+    const courses = await CourseTable.findAll({
+      where: {
+        id: {
+          [Op.in]: courseIds,
+        },
+      },
+    });
+
+    // Check if all IDs exist
+    if (courses.length !== courseIds.length) {
+      return res.status(404).json({ message: "Some course IDs do not exist",  });
     }
 
     //generating passwoerd
@@ -64,7 +84,8 @@ export const create = async (req: Request, res: Response) => {
     console.log("Generated Strong Password:", strongPassword);
 
     //storing auto created password in req object
-    req.body.password = strongPassword;
+    const hashedPassword = await bcrypt.hash(strongPassword, 10);
+    req.body.password = hashedPassword;
 
     const randomNumber = Math.floor(10000 + Math.random() * 90000);
     const namePart = req.body.emailAddress.slice(0, 4);
@@ -85,7 +106,7 @@ export const create = async (req: Request, res: Response) => {
     req.body.userName = emailPart;
 
     // check if mobile no is alredy registered
-    let isRegistered = await Student.findOne({where : {contactnumber : req.body.contactnumber , emailaddress : req.body.emailaddress},});
+    let isRegistered = await Student.findOne({where : {contactNumber : req.body.contactNumber , emailAddress : req.body.emailAddress},});
     if(isRegistered){
       return res.status(400).send({message : 'This number is already registered with us',status : false})
     }
@@ -303,38 +324,36 @@ export const DeleteFunction = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
 
-
-   
      const { userName, password } = req.body;
     // Validate input
     if (!userName || !password) {
       return res
         .status(400)
-        .json({ message: "Mobile number and password are required" });
+        .json({ message: "userName and password are required" });
     }
     // Find the user by mobile number
 
-    let checkNumber = await Student.findOne({
+    let checkUserName = await Student.findOne({
       where: { userName, isDeleted: false },
     });
 
-    if (!checkNumber) {
+    if (!checkUserName) {
       return res
         .status(401)
-        .json({ message: "Invalid mobile number or password" });
+        .json({ message: "Invalid userName  or password" });
     }
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(password, checkNumber.password);
+    const isMatch = await bcrypt.compare(password, checkUserName.password);
 
     if (!isMatch) {
       return res
         .status(401)
-        .json({ message: "Invalid mobile number or password" });
+        .json({ message: "Invalid  password" });
     }
 
     // Generate a token
-    const token = jwt.sign({ id: checkNumber.id }, `${process.env.SECRET_KEY}`);
+    const token = jwt.sign({ id: checkUserName.id }, `${process.env.SECRET_KEY}`);
 
     await Student.update(
       { token: token },
@@ -342,7 +361,7 @@ export const login = async (req: Request, res: Response) => {
     );
 
 
-    const studentId =  checkNumber.id;
+    const studentId =  checkUserName.id;
 
     const courses = await CourseTable.findAll({
       attributes: ['name'], // Select only the 'name' attribute from CourseTable
@@ -361,36 +380,10 @@ export const login = async (req: Request, res: Response) => {
     });
     console.log(courses);
 
-
-    //send mail to user
-    // Send mail with defined transport object
-    let isMailSent = null;
-
-    // Setup email data
-const mailOptions = {
-  from: `${process.env.USER_NAME}`, // sender address
-  to: 'vikramsinghkhinchi5@gmail.com', // list of receivers
-  subject: 'Hello ✔', // Subject line
-  text: 'Hello world this is testng mesage for you ?', // plain text body
-  html: '<b>Hello world this is html hwllo works ?</b>' // html body
-};
-
-
-transporter.sendMail(mailOptions, (error : any , info : any) => {
-  console.log('error and info ',error,info)
-  if (error) {
-    isMailSent = error
-    return console.log('Error:', error);
-  }
-  isMailSent = info
-  console.log('Message sent: %s', info.messageId);
-});
-
-
     res
       .status(200)
       .json({
-        data: { isMailSent ,courses, userData , token, id: checkNumber.id, mobileNo: checkNumber.contactNumber },
+        data: {courses, userData , token, id: checkUserName.id, mobileNo: checkUserName.contactNumber },
       });
   } catch (error) {
     //console.log("error", error);
@@ -731,5 +724,51 @@ export const forgotPasswordVerify3 = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+
+
+//password update 
+// Function to find a user by mobile number and validate password
+export const updatePassword = async (req: Request, res: Response) => {
+  try {
+    let userId = req.body.userId
+    const { oldPassword, newPassword } = req.body;
+
+    // Validate input
+    if ( !oldPassword || !newPassword) {
+      return res.status(400).json({ message: " old password, and new password are required" });
+    }
+
+    // Find the user by username
+    let user = await Student.findOne({
+      where: { id : userId, isDeleted: false },
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Compare old passwords
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: "Old password is incorrect" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the password
+    await Student.update(
+      { password: hashedPassword },
+      { where: { id : userId, isDeleted: false } }
+    );
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ message: "Internal server error", data: error });
   }
 };
