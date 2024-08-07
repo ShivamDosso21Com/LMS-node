@@ -359,6 +359,106 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Notes",
+			"item": [
+				{
+					"name": "create-notes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n  \"courseId\": 111,\r\n  \"topic\": \"HTML\",\r\n  \"shortDescription\": \"HTML stands for HyperText Markup Language. It is the standard language for creating webpages.\",\r\n  \"description\": \"HTML is used to create and structure sections, paragraphs, and links on a website. It can embed programs written in a scripting language such as JavaScript, which affects the behavior and content of web pages. HTML can also integrate CSS to define the look and layout of content.\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/notes/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"notes",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "notes-getAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/notes/getAll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"notes",
+								"getAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-ByCourseId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/notes/getByCourseId/112",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"notes",
+								"getByCourseId",
+								"112"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/notes/deleteByCourseId/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"notes",
+								"deleteByCourseId",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

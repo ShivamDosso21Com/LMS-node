@@ -84,20 +84,18 @@ export const create = async (req: Request, res: Response) => {
     //user name
     req.body.userName = emailPart;
 
-    //check if mobile no is alredy registered
-    // let isRegistered = await Student.findOne({where : {contactnumber : req.body.contactnumber , emailaddress : req.body.emailaddress},});
-    // if(isRegistered){
-    //   return res.status(400).send({message : 'This number is already registered with us',status : false})
-    // }
+    // check if mobile no is alredy registered
+    let isRegistered = await Student.findOne({where : {contactnumber : req.body.contactnumber , emailaddress : req.body.emailaddress},});
+    if(isRegistered){
+      return res.status(400).send({message : 'This number is already registered with us',status : false})
+    }
     //refer by id
-    let flag = false;
     if (req.body.referbyId) {
       let result = await Student.findOne({
         where: { studentId: req.body.referbyId },
       });
       //console.log('checking refer id in database',result);
       if (result) {
-        flag = true; 
         const referAmount = `${process.env.REFER_WALLET_AMOUNT}` // Replace with your secret key
         req.body.wallet = referAmount
       } else {

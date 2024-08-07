@@ -32,7 +32,7 @@ Student.init(
     contactNumber: {
       type: new DataTypes.BIGINT(),
       allowNull: false,
-      unique: true,
+      // unique: true,
       validate: {
         isTenDigits(value: number) {
           if (!/^[6-9]\d{9}$/.test(String(value))) {
@@ -42,9 +42,9 @@ Student.init(
       },
     },
     studentId: {
-      type: DataTypes.STRING(24),
+      type: DataTypes.STRING(),
       allowNull: false,
-      unique: true,
+      // unique: true,
     },
     studentName: {
       type: new DataTypes.STRING(128),
@@ -70,7 +70,7 @@ Student.init(
     emailAddress: {
       type: new DataTypes.STRING(128),
       allowNull: false,
-      unique: true,
+      // unique: true,
       validate: {
         isEmail: true,
       },
@@ -119,7 +119,6 @@ Student.init(
 // Define the associations
 Student.hasMany(StudentCourseTable, { foreignKey: 'studentId' });
 StudentCourseTable.belongsTo(Student, { foreignKey: 'studentId' });
-// Student.hasOne(StudentCourseTable, { foreignKey: 'studentId' });
 
 
 sequelize.sync({ alter: false }).then(() => {

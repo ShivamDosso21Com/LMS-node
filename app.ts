@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes';
 import uploadRoutes from './routes/upload';
+import notesRoutes from './routes/notesRoutes';
 import cors from 'cors';
 import path from 'path';
 
@@ -17,7 +18,7 @@ app.use(cors());
 app.use('/api', uploadRoutes);
 
 app.use('/api', userRoutes);
-
+app.use('/api', notesRoutes);
 
 
 

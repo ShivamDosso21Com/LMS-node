@@ -119,8 +119,6 @@ CourseTable.init(
 
 CourseTable.hasMany(StudentCourseTable, { foreignKey: 'courseId' });
 StudentCourseTable.belongsTo(CourseTable, { foreignKey: 'courseId' });
-// 
-// CourseTable.hasOne(StudentCourseTable, { foreignKey: 'courseId' });
 
 
 
