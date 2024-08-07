@@ -8,25 +8,13 @@ export const createUser = async (data: any) => {
   return Student.create(data);
 };
 
-export const getUser = async (id: number) => {
 
-  return Student.findOne({
-    where: {
-      id: id,
-      isDeleted: false
-    },
-    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
-  });
-  
-  
-  
-}  
 
 export const findAllUsers = async () => {
   return Student.findAll({
     where: {
       isDeleted: false
     },
-    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt','isDeleted','token','otp'] }
   });
 };

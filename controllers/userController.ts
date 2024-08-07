@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createUser, getUser, findAllUsers } from "../services/userService";
-import { ValidationError, where } from "sequelize";
+import { createUser, findAllUsers } from "../services/userService";
+import { Sequelize, ValidationError, where } from "sequelize";
 
 import bcrypt from "bcrypt"; // Assuming you're using bcrypt for password hashing
 import jwt from "jsonwebtoken"; // For generating JWT tokens
@@ -105,10 +105,19 @@ export const create = async (req: Request, res: Response) => {
     //user name
     req.body.userName = emailPart;
 
-    // check if mobile no is alredy registered
-    let isRegistered = await Student.findOne({where : {contactNumber : req.body.contactNumber , emailAddress : req.body.emailAddress},});
-    if(isRegistered){
-      return res.status(400).send({message : 'This number is already registered with us',status : false})
+    // check if mobile no is alredy registered and email both
+    let isRegistered = await Student.findOne({
+      where: {
+        [Op.or]: [
+          { contactNumber: req.body.contactNumber },
+          { emailAddress: req.body.emailAddress }
+        ],
+        isDeleted: false,
+      },
+    });
+
+    if (isRegistered) {
+      return res.status(409).json({ message: "Contact number or email address already exists" });
     }
     //refer by id
     if (req.body.referbyId) {
@@ -132,7 +141,6 @@ export const create = async (req: Request, res: Response) => {
 
     //sotre user id and course id in this table 
     let courseId = req.body.courseId; 
-   
 
     for(let i = 0 ; i <courseId.length; i++){
       let finalData = {
@@ -239,7 +247,13 @@ transporter.sendMail(mailOptions, (error : any , info : any) => {
 };
 
 export const get = async (req: Request, res: Response) => {
-  const data = await getUser(parseInt(req.body.userId));
+    const data = await Student.findOne({
+      where: {
+        id: req.body.userId,
+        isDeleted: false
+      },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt','isDeleted','token','otp'] }
+    }); 
   if (data) {
     return res.status(200).send({ data });
   } else {
@@ -377,6 +391,7 @@ export const login = async (req: Request, res: Response) => {
     // Extract course names and student data directly from the results
     let userData = await Student.findOne({
       where: { userName, isDeleted: false },
+      attributes : { exclude : ['isDeleted','createdAt','updatedAt','password','token','status','otp']}
     });
     console.log(courses);
 
