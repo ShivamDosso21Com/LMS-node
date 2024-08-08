@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { create, get, findAll, login, forgotPassword, forgotPasswordVerify, updateStudent, otpGenerate, forgotPasswordVerify3, Logout, DeleteFunction, updatePassword, BatchCreate, updateProfilePhoto, getProfilePhoto, checkReferalCode } from '../controllers/userController';
+import { create, get, findAll, login, forgotPassword, forgotPasswordVerify, updateStudent, otpGenerate, forgotPasswordVerify3, Logout, DeleteFunction, updatePassword, BatchCreate, updateProfilePhoto, getProfilePhoto, checkReferalCode, ReferAndEarnMoney } from '../controllers/userController';
 import authenticateToken from '../middleware/middleware';
 
 
@@ -27,7 +27,7 @@ router.put('/password/update',authenticateToken,updatePassword);
 router.get('/profile-photo',authenticateToken, getProfilePhoto);
 //check refereal code 
 router.get('/student/refercode/:referalCode',checkReferalCode)
-
+router.get('/referEarn',ReferAndEarnMoney)
 //create batch
 router.post('/batch',BatchCreate);
 

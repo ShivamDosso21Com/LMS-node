@@ -963,3 +963,17 @@ export const checkReferalCode = async (req: Request, res: Response) => {
 };
 
 
+//get profile photo api 
+export const ReferAndEarnMoney = async (req: Request, res: Response) => {
+  try {
+ const referAmount = `${process.env.REFER_WALLET_AMOUNT}`
+ return res.status(200).send({message : 'refer and earn money ', data : referAmount})
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+
+
+
