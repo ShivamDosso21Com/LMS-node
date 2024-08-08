@@ -51,7 +51,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
       if (!student) {
         return res.status(403).send({message  : "user is not activated please contact to admin"}); // Forbidden if user not found or not active
       }
-
+     
     req.body.userId = id; // Attach user ID to request object for use in routes
     //console.log('inside middleware ',req.body.userId)
     next();

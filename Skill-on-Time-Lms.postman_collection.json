@@ -67,9 +67,12 @@
 					"response": []
 				},
 				{
-					"name": "Delete-Student",
+					"name": "check-refer-code",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
@@ -80,7 +83,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"contactNumber\" : 8824476139\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,7 +91,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/student/delete",
+							"raw": "http://localhost:5000/api/student/refercode/vtec53905",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -97,7 +100,8 @@
 							"path": [
 								"api",
 								"student",
-								"delete"
+								"refercode",
+								"vtec53905"
 							]
 						}
 					},
@@ -165,6 +169,14 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			]
 		},
@@ -178,7 +190,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userName\" : \"vwkraskhnchi\",\r\n    \"password\" : \"6a1kkhc9ci\"\r\n}",
+							"raw": "{\r\n    \"userName\" : \"vtechma0ter7tygu87u\",\r\n    \"password\" : \"ucvh8roey7\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -367,10 +379,16 @@
 					"name": "create-notes",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMDM0NjI3fQ.i7oRZUDTDyojnWe3MtZ-i4gFZ-msa_ujzqkIIltQASo",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "\r\n{\r\n  \"courseId\": 111,\r\n  \"topic\": \"HTML\",\r\n  \"shortDescription\": \"HTML stands for HyperText Markup Language. It is the standard language for creating webpages.\",\r\n  \"description\": \"HTML is used to create and structure sections, paragraphs, and links on a website. It can embed programs written in a scripting language such as JavaScript, which affects the behavior and content of web pages. HTML can also integrate CSS to define the look and layout of content.\"\r\n}\r\n",
+							"raw": "{\r\n  \"courseId\": 112,\r\n  \"topic\": \"css new 3 \",\r\n  \"shortDescription\": \"slace tag\",\r\n  \"description\": \"  sections, paragraphs, and links on a website. It can embed programs written in a scripting language such as JavaScript, which affects the behavior and content of web pages. HTML can also integrate CSS to define the look and layout of content.\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -397,7 +415,13 @@
 					"name": "notes-getAll",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMDM0NjI3fQ.i7oRZUDTDyojnWe3MtZ-i4gFZ-msa_ujzqkIIltQASo",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:5000/api/notes/getAll",
 							"protocol": "http",
@@ -418,7 +442,13 @@
 					"name": "get-ByCourseId",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMDM0NjI3fQ.i7oRZUDTDyojnWe3MtZ-i4gFZ-msa_ujzqkIIltQASo",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:5000/api/notes/getByCourseId/112",
 							"protocol": "http",
@@ -440,9 +470,15 @@
 					"name": "Delete",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMDM0NjI3fQ.i7oRZUDTDyojnWe3MtZ-i4gFZ-msa_ujzqkIIltQASo",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:5000/api/notes/deleteByCourseId/1",
+							"raw": "http://localhost:5000/api/notes/deleteByCourseId/8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -452,7 +488,201 @@
 								"api",
 								"notes",
 								"deleteByCourseId",
-								"1"
+								"8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update-password",
+			"item": [
+				{
+					"name": "update=password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMDMzMTU3fQ.uyeewGrJ8gOQeIcT_mQDtNZRSDIpUAAl9_ZcPoj4I58",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"oldPassword\" : \"imgu72lmv8\",\r\n  \"newPassword\" : \"this is not vikram\"   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/password/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"password",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "upload-videos-photos",
+			"item": [
+				{
+					"name": "upload-video",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Sample Video",
+									"type": "text"
+								},
+								{
+									"key": "video",
+									"type": "file",
+									"src": "/C:/Users/vikra/Downloads/Video/Radhe Govinda — Radhika Das — LIVE Kirtan at Union Chapel, London_4.mp4"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/upload",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-batch",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courseId\": 3,\r\n  \"batchName\": \"Batch C\",\r\n  \"RegistrationStartDate\": \"2024-09-15\",\r\n  \"RegistrationEndDate\": \"2024-09-30\",\r\n  \"totalStudent\": 1000,\r\n  \"remainingStudent\": 1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload-photo-profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMTAxOTk1fQ.C5kIwOt2k86KQNfN0Cl3l90XNVyC4njhQHbpIcuPhr0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "studentProfile",
+									"type": "file",
+									"src": "/C:/Users/vikra/Downloads/check.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/student/profilephoto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"student",
+								"profilephoto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-profile-photo-link",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzIzMTAxOTk1fQ.C5kIwOt2k86KQNfN0Cl3l90XNVyC4njhQHbpIcuPhr0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/profile-photo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"profile-photo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-profile-photo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/uploads/profile_pics/1723102647784.jpeg",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"uploads",
+								"profile_pics",
+								"1723102647784.jpeg"
 							]
 						}
 					},

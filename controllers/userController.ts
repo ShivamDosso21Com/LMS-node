@@ -7,9 +7,17 @@ import jwt from "jsonwebtoken"; // For generating JWT tokens
 import { Otp, Student } from "../models/userModel";
 import {StudentCourseTable} from '../models/studentCourseModel';
 import {CourseTable} from '../models/courseModel';
+import {BatchModel} from '../models/BatchModel';
+import {StudentBatch} from '../models/studentBatch';
+
+
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 import {transporter} from '../middleware/nodeMailer';
 import { Op } from "sequelize";
+import sequelize from "sequelize";
 
 
 function generateStrongPassword(data: {
@@ -41,6 +49,12 @@ function generateStrongPassword(data: {
   const password = baseString.substring(0, passwordLength);
 
   return password;
+}
+
+
+export const BatchCreate = async (req : Request, res : Response) =>{
+     const create = await BatchModel.create(req.body);
+     return res.send({message : 'batch created ', data : create})
 }
 
 
@@ -135,6 +149,31 @@ export const create = async (req: Request, res: Response) => {
       req.body.referbyId = "null";
     }
 
+    //here store batch details
+
+    const batch = await BatchModel.update(
+      { 
+        remainingStudent: sequelize.literal('remainingStudent - 1')
+      },
+      {
+        where: { 
+          courseId: {
+            [Op.in]: courseIds
+          }
+        }
+      }
+    );
+    
+    //get all batches using this id 
+    const batches = await BatchModel.findAll({
+      where: {
+        courseId: {
+          [Op.in]: courseIds
+        }
+      },
+    });
+
+    console.log('batches',batches)
 
     const finalresult = await createUser(req.body);
     finalresult.password  =strongPassword;
@@ -148,7 +187,15 @@ export const create = async (req: Request, res: Response) => {
         courseId : courseId[i]
      }
      await StudentCourseTable.create(finalData);
+     await StudentBatch.create({
+      studentId : finalresult.id,
+      batchId : batches[i].id,
+      courseId :  courseId[i],
+  });
     }
+
+    //create student batch table here 
+  
 
     const mailOptions = {
       from: process.env.USER_NAME,
@@ -271,6 +318,9 @@ export const updateStudent = async (req: Request, res: Response) => {
   try {
     const id = req.body.userId; // Get student ID from URL parameters
     const updateData = req.body; // Get the fields to update from the request body
+    if(updateData.name){
+      return res.status(400).send({message : 'user can not update  name please contact to support team' })
+    }
     //console.log('req body data ',req.body)
     // Ensure the ID is provided
     if (!id) {
@@ -787,3 +837,129 @@ export const updatePassword = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error", data: error });
   }
 };
+
+
+
+//update profile photo
+// Function to find a user by mobile number and validate password
+
+// Set up Multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/profile_pics'); // Directory where profile pictures will be stored
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Generate a unique filename
+  }
+});
+
+const upload = multer({ storage: storage }).single('studentProfile'); // Handling a single file upload
+
+
+export const updateProfilePhoto = async (req: Request, res: Response) => {
+  const id = req.body.userId;
+
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(500).json({ message: "File upload failed", error: err });
+    }
+
+    try {
+      if (!id) {
+        return res.status(400).json({ message: "User ID is required", id });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Find the student to get the current profile photo path
+      const student = await Student.findOne({
+        where: { id: id, isDeleted: false },
+        attributes: ['studentProfile']
+      });
+
+      if (!student) {
+        return res.status(404).json({ message: "Student not found or already deleted" });
+      }
+
+      const oldFileName = path.basename(student.studentProfile);
+      const oldFilePath = path.resolve('uploads/profile_pics', oldFileName);
+
+     
+      // If the student has a profile photo, delete the old file
+     fs.unlink(oldFilePath, (err) => {
+          if (err) {
+            console.error("Error deleting old profile photo:", err);
+          }
+        });
+      
+     
+      // Update the studentProfile field with the new file path
+      await Student.update(
+        { studentProfile: `/uploads/profile_pics/${req.file.filename}` },
+        { where: { id: id, isDeleted: false } }
+      );
+
+     return res.status(200).json({ message: "Profile photo updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error", error });
+    }
+  });
+};
+
+//get profile photo api 
+export const getProfilePhoto = async (req: Request, res: Response) => {
+  try {
+    const id  = req.body.userId;
+
+    if (!id) {
+      return res.status(400).json({ message: "studentId is required" });
+    }
+
+    // Fetch the student's profile photo URL
+    const student = await Student.findOne({
+      where: { id: id, isDeleted: false },
+      attributes: ['studentProfile'] // Only fetch the studentProfile attribute
+    });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Send the profile photo URL
+    res.status(200).json({ profilePhoto: student.studentProfile });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+
+
+//get profile photo api 
+export const checkReferalCode = async (req: Request, res: Response) => {
+  try {
+    const {referalCode} = req.params;
+
+    if (!referalCode) {
+      return res.status(400).json({ message: "referalCode is required" });
+    }
+
+    // Fetch the student's profile photo URL
+    const student = await Student.findOne({
+      where: { studentId: referalCode, isDeleted: false },
+      attributes: ['studentId','name'] // Only fetch the studentProfile attribute
+    });
+
+    if (!student) {
+      return res.status(404).json({ message: "referalCode not found" });
+    }
+
+    // Send the profile photo URL
+    res.status(200).json({ referalCode:  student });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+
