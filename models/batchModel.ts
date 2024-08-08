@@ -72,4 +72,8 @@ BatchModel.init(
   }
 );
 
+sequelize.sync({ alter: false }).then(() => {
+  console.log('batch  table created.');
+});
+
 export {BatchModel};
