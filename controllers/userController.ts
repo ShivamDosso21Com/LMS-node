@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken"; // For generating JWT tokens
 import { Otp, Student } from "../models/userModel";
 import {StudentCourseTable} from '../models/studentCourseModel';
 import {CourseTable} from '../models/courseModel';
-import {BatchModel} from '../models/BatchModel';
+// import {BatchModel} from '../models/BatchModel';
 import {StudentBatch} from '../models/studentBatch';
 
 
@@ -53,7 +53,7 @@ function generateStrongPassword(data: {
 
 
 export const BatchCreate = async (req : Request, res : Response) =>{
-     const create = await BatchModel.create(req.body);
+    //  const create = await BatchModel.create(req.body);
      return res.send({message : 'batch created ', data : create})
 }
 
@@ -151,29 +151,29 @@ export const create = async (req: Request, res: Response) => {
 
     //here store batch details
 
-    const batch = await BatchModel.update(
-      { 
-        remainingStudent: sequelize.literal('remainingStudent - 1')
-      },
-      {
-        where: { 
-          courseId: {
-            [Op.in]: courseIds
-          }
-        }
-      }
-    );
+    // const batch = await BatchModel.update(
+    //   { 
+    //     remainingStudent: sequelize.literal('remainingStudent - 1')
+    //   },
+    //   {
+    //     where: { 
+    //       courseId: {
+    //         [Op.in]: courseIds
+    //       }
+    //     }
+    //   }
+    // );
     
     //get all batches using this id 
-    const batches = await BatchModel.findAll({
-      where: {
-        courseId: {
-          [Op.in]: courseIds
-        }
-      },
-    });
+    // const batches = await BatchModel.findAll({
+    //   where: {
+    //     courseId: {
+    //       [Op.in]: courseIds
+    //     }
+    //   },
+    // });
 
-    console.log('batches',batches)
+    // console.log('batches',batches)
 
     const finalresult = await createUser(req.body);
     finalresult.password  =strongPassword;
@@ -189,7 +189,7 @@ export const create = async (req: Request, res: Response) => {
      await StudentCourseTable.create(finalData);
      await StudentBatch.create({
       studentId : finalresult.id,
-      batchId : batches[i].id,
+      // batchId : batches[i].id,
       courseId :  courseId[i],
   });
     }
